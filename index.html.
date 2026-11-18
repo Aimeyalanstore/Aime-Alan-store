@@ -1,0 +1,162 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AIME Y ALAN STORE</title>
+<style>
+body {
+  margin: 0;
+  background: #090909;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+header {
+  text-align: center;
+  padding: 30px;
+  background: #260011;
+  border-bottom: 2px solid #ff287b;
+}
+h1, h2 { color: #ff4b96; }
+main { padding: 16px; max-width: 850px; margin: auto; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(145px,1fr));
+  gap: 12px;
+}
+.card, .panel {
+  background: #191319;
+  border: 1px solid #63304b;
+  border-radius: 12px;
+  padding: 14px;
+}
+.price { color: #ff83b5; font-weight: bold; }
+button {
+  background: #f12678;
+  color: white;
+  border: 0;
+  border-radius: 8px;
+  padding: 11px;
+}
+input, select {
+  width: 100%;
+  padding: 12px;
+  margin: 7px 0 14px;
+  background: #292329;
+  color: white;
+  box-sizing: border-box;
+}
+</style>
+</head>
+<body>
+<header>
+<h1>🐭 AIME Y ALAN STORE</h1>
+<p>💗 Tu tienda de Free Fire 💗</p>
+</header>
+<main>
+<h2>💎 RECARGAS INFINITAS 10%</h2>
+<div class="grid" id="diamonds"></div>
+
+
+<h2>🎮 OTROS PRODUCTOS</h2>
+<div class="grid" id="extras"></div>
+
+<div class="panel">
+<h2>🛒 MI CARRITO</h2>
+<div id="cart">Todavía está vacío.</div>
+<h3>Total: $<span id="total">0</span> ARS</h3>
+</div>
+
+<div class="panel">
+<h2>📋 DATOS DEL PEDIDO</h2>
+<label>ID de jugador</label>
+<input id="player" placeholder="ID de Free Fire">
+<label>Nombre del jugador</label>
+<input id="playername" placeholder="Nombre aproximado">
+<label>Tu nombre</label>
+<input id="customer" placeholder="Nombre del comprador">
+<label>Método de pago</label>
+<select id="payment">
+<option>Mercado Pago</option>
+<option>Transferencia bancaria</option>
+<option>Prex</option>
+<option>Otro</option>
+</select>
+<label>Titular del pago</label>
+<input id="holder" placeholder="Nombre del titular">
+<label>WhatsApp</label>
+<select id="phone">
+<option value="5491128198851">Contacto 1</option>
+<option value="5492234232577">Contacto 2</option>
+</select>
+<button onclick="sendOrder()">💗 ENVIAR PEDIDO</button>
+</div>
+</main>
+
+<script>
+const diamonds=[
+["100 + 10",1600],["200 + 20",3200],
+["310 + 31",4300],["520 + 52",6700],
+["1.060 + 106",11800],["1.500 + 238",18300],
+["2.180 + 216",22800],["3.162 + 400",34600],
+["4.314 + 478",45600],["5.600 + 560",57000],
+["11.668 + 652",114000],["22.322 + 1.678",228000]
+];
+const extras=[
+["Pase Booyah",2300],
+["Membresía Básica",1200],
+["Membresía Semanal",3400],
+["Membresía Mensual",13700],
+["Fragmentos EVO (unidad)",75],
+["Caja de fragmentos (unidad)",450]
+];
+let cart=[];
+
+function render(items,id){
+document.getElementById(id).innerHTML=items.map((p,i)=>
+`<div class="card">
+<h3>${p[0]}</h3>
+<p class="price">$${p[1].toLocaleString("es-AR")}</p>
+<button onclick="add('${id}',${i})">AGREGAR</button>
+</div>`).join("");
+}
+render(diamonds,"diamonds");
+render(extras,"extras");
+
+function add(id,i){
+let p=(id==="diamonds"?diamonds:extras)[i];
+let qty=1;
+if(id==="extras" && i>=4){
+qty=Number(prompt("Cantidad (mínimo "+(i===4?35:7)+")"));
+if(!Number.isInteger(qty)||qty<(i===4?35:7)){
+alert("Cantidad mínima no válida");return;
+}
+}
+cart.push({name:p[0]+" x"+qty,price:p[1]*qty});
+update();
+}
+function update(){
+document.getElementById("cart").innerHTML=cart.length?
+cart.map((p,i)=>`<p>${p.name} — $${p.price.toLocaleString("es-AR")} <button onclick="removeItem(${i})">X</button></p>`).join("")
+:"Todavía está vacío.";
+document.getElementById("total").textContent=
+cart.reduce((s,p)=>s+p.price,0).toLocaleString("es-AR");
+}
+function removeItem(i){cart.splice(i,1);update();}
+function sendOrder(){
+let player=document.getElementById("player").value.trim();
+let name=document.getElementById("playername").value.trim();
+let customer=document.getElementById("customer").value.trim();
+let holder=document.getElementById("holder").value.trim();
+if(!cart.length||!player||!name||!customer||!holder){
+alert("Completá los datos y agregá productos.");return;
+}
+let total=cart.reduce((s,p)=>s+p.price,0);
+let msg=`PEDIDO AIME Y ALAN STORE\nCliente: ${customer}\nID: ${player}\nJugador: ${name}\nProductos:\n${cart.map(p=>p.name+" - $"+p.price).join("\n")}\nTotal: $${total} ARS\nPago: ${document.getElementById("payment").value}\nTitular: ${holder}`;
+window.open("https://wa.me/"+document.getElementById("phone").value+"?text="+encodeURIComponent(msg),"_blank");
+}
+</script>
+<footer>🐭 AIME Y ALAN STORE · Gracias por tu compra 💗</footer>
+</body>
+</html>
